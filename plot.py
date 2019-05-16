@@ -2,55 +2,80 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+import time
+import threading
 
 class GraphGui(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
-
-        self.top_fram = tk.Frame(self).pack(side = "top")
-        self.bottom_fram = tk.Frame(self).pack(side = "bottom")
-
-       
-        tk.Label(self.bottom_fram,text="x1 :").pack()
-        self.x1 = tk.Entry(self.bottom_fram)
-        self.x1.pack()
+        self.geometry("600x600") # set size window
+        self.resizable(False,False) # disable re-size
         
-        tk.Label(self.bottom_fram,text="y1 :").pack()
-        self.y1 = tk.Entry(self.bottom_fram)
-        self.y1.pack()
+        self.continuePlot = False
 
-        tk.Label(self.bottom_fram,text="x2 :").pack()
-        self.x2 = tk.Entry(self.bottom_fram)
-        self.x2.pack()
+        self.top_fram = tk.Frame(self)
+        self.top_fram.pack(side = "top")
+        self.bottom_fram = tk.Frame(self)
+        self.bottom_fram.pack(side = "bottom")
 
-        tk.Label(self.bottom_fram,text="y2 :").pack()
-        self.y2 = tk.Entry(self.bottom_fram)
-        self.y2.pack()
+        tk.Label(self.bottom_fram,text="u :").pack()
+        self.u = tk.Entry(self.bottom_fram)
+        self.u.pack()
+        
+        tk.Label(self.bottom_fram,text="a :").pack()
+        self.a = tk.Entry(self.bottom_fram)
+        self.a.pack()
+
+        tk.Label(self.bottom_fram,text="t :").pack()
+        self.t = tk.Entry(self.bottom_fram)
+        self.t.pack()
+
+        #tk.Label(self.bottom_fram,text="y2 :").pack()
+        #self.y2 = tk.Entry(self.bottom_fram)
+        #self.y2.pack()
 
         self.button = tk.Button(self.bottom_fram, text="Plot", command=self.getData)
         self.button.pack(side='left')
 
-        self.btn_exit = tk.Button(self.bottom_fram, text='Quit', command=self.quit)
+        self.btn_exit = tk.Button(self.bottom_fram, text='Qut', command=self.quit)
         self.btn_exit.pack(side='right')     
        
 
     def getData(self):
-        data_x1 = float(self.x1.get())
-        data_y1 = float(self.y1.get())
-        data_x2 = float(self.x2.get())
-        data_y2 = float(self.y2.get())
+        data_u = float(self.u.get())
+        data_a = float(self.a.get())
+        data_t = float(self.t.get())
+        #data_y2 = float(self.y2.get())
 
-        print("x1: {} y1: {}\nx2: {} y2: {}".format(data_x1, data_y1, data_x2, data_y2))
-        self.plot_gui(data_x1, data_y1, data_x2, data_y2)
+        print("u: {}\na: {}\nt: {} ".format(data_u, data_a, data_t))
+        self.calculate(data_u, data_a, data_t)
+
+
+    def calculate(self,u,a,t):
+        s = (u*t) + (0.5*a*t*t)
+        print("s:",s)
+        self.change_state()
+        self.plot_gui(s,t)
+
         
-    def plot_gui(self,x1,y1,x2,y2):
-        fig = Figure(figsize=(6,6))
+    def plot_gui(self,s,t):
+        
+        fig = Figure(figsize=(4,4))
         a = fig.add_subplot(111)
-        a.plot([x1,y1,x2,y2])
+        a.plot([t,s])
 
         canvas = FigureCanvasTkAgg(fig, master=self.top_fram)
-        canvas.get_tk_widget().pack(side="right")
+        canvas.get_tk_widget().pack()
         canvas.draw()
+        
+    def change_state(self):
+        if self.continuePlot == True:
+            self.continuePlot = False
+        else:
+            self.continuePlot = True
+
+
+    
 
 
 app = GraphGui()
