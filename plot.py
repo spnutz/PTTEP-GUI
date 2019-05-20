@@ -12,6 +12,7 @@ import math
 class Graph(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
+        self.resizable(False, False) # disable resize window
         self.title("Graph GUI")
 
         # Create Tap
@@ -37,10 +38,15 @@ class Graph(tk.Tk):
         self.big_frame.grid(column=0, row=0)
 
         # Frame input
-        self.frame1 = ttk.LabelFrame(self.big_frame, text="Layer 1")
-        self.frame1.grid(row=0, column=1, padx=20, pady=20)
-        self.frame_layer2 = ttk.LabelFrame(self.big_frame, text="Layer 2")
-        self.frame_layer2.grid(row=0, column=2, padx=20, pady=20)
+        self.frame_input = ttk.LabelFrame(self.big_frame, text="input")
+        self.frame_input.grid(row=0, column=1)
+
+
+        self.frame1 = ttk.LabelFrame(self.frame_input, text="Layer 1")
+        self.frame1.grid(row=0, column=0, padx=20, pady=20)
+
+        self.frame_layer2 = ttk.LabelFrame(self.frame_input, text="Layer 2")
+        self.frame_layer2.grid(row=1, column=0, padx=20, pady=20)
 
         # Frame Figure
         self.frame2 = ttk.LabelFrame(self.big_frame)
@@ -125,8 +131,17 @@ class Graph(tk.Tk):
         self.total_zp2 = tk.Label(self.frame_layer2, textvariable=self.label_zp2)
         self.total_zp2.grid(row=5, column=1)
 
+        # show Rp
+        tk.Label(self.frame1, text="Rp :").grid(row=5, column=0)
+        self.rp = 0
+        self.label_rp = IntVar()
+        self.label_rp.set(self.rp)
+        self.total_rp = tk.Label(self.frame1, textvariable=self.label_rp)
+        self.total_rp.grid(row=5, column=1)
+
+
         # Button plot
-        self.btn_plot = tk.Button(self.frame1, text="Plot", command=self.getData, width=5)
+        self.btn_plot = tk.Button(self.frame_layer2, text="Plot", command=self.getData, width=5)
         self.btn_plot.grid(row=6, column=1)
 
         # fig 
@@ -148,36 +163,40 @@ class Graph(tk.Tk):
 
         # calculate poisson
         self.poisson1 = self.cal_poisson(S1, P1)
-        self.label_poisson1.set(self.poisson1)
+        self.label_poisson1.set(round(self.poisson1, 3))
 
         self.poisson2 = self.cal_poisson(S2, P2)
-        self.label_poisson2.set(self.poisson2)
+        self.label_poisson2.set(round(self.poisson2, 3))
 
         # calculate Vp/Vs1
         self.vp_vs1 = P1/S1
-        self.label_vp_vs1.set(self.vp_vs1)
+        self.label_vp_vs1.set(round(self.vp_vs1, 3))
 
         self.vp_vs2 = P2/S2
-        self.label_vp_vs2.set(self.vp_vs2)
+        self.label_vp_vs2.set(round(self.vp_vs2, 3))
 
         # calculate Zp1
         self.zp1 = D1*P1
-        self.label_zp1.set(self.zp1)
+        self.label_zp1.set(round(self.zp1, 3))
 
         self.zp2 = D2*P2
-        self.label_zp2.set(self.zp2)
+        self.label_zp2.set(round(self.zp2, 3))
 
         #calculate reflection
         data_x = []
         data_y = []
-        for n in range(11):
+        for n in range(91):
             t = math.pi
             x = (n*t)/180 # radians
             reflect = self.reflection(P1, D1, P2, D2, self.poisson1, self.poisson2, x)
             data_x.append(float(reflect))
-            data_y.append(float(n*10))
-        print(data_x)
-        print(data_y)
+            data_y.append(float(n))
+        #print(data_x)
+        #print(data_y)
+
+        # calculate rp
+        self.rp = data_x[0]
+        self.label_rp.set(round(self.rp, 3))
         
         # plot
         self.plot_graph(data_y, data_x)
@@ -186,18 +205,28 @@ class Graph(tk.Tk):
     
     def cal_poisson(self, s_wave, p_wave):
         # (0.5-(s_wave / p_wave)^2)/(1-(s_wave/p_wave)^2)
-        P = (0.5-(s_wave/p_wave)**2)/(1-(s_wave/p_wave)**2)
-        return P
+        try:
+            P = (0.5-(s_wave/p_wave)**2)/(1-(s_wave/p_wave)**2)
+            return P
+        except ZeroDivisionError:
+            print('Zero division')
+            msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
+        
 
     def reflection(self, P1, D1, P2, D2, poisson1, poisson2, x):
         # R = ((P2*D2 - P1*D1)/(P2*D2 + P1*D1))*(cos(x)^2)+ (poisson2-poisson1)/((1-(poisson2+poisson1)/2)^2)*(sin(x)^2)
-        R = ((P2*D2 - P1*D1)/(P2*D2 + P1*D1))*(math.cos(x)**2)+ (poisson2-poisson1)/((1-(poisson2+poisson1)/2)**2)*(math.sin(x)**2)
-        return R
+        try:   
+            R = ((P2*D2 - P1*D1)/(P2*D2 + P1*D1))*(math.cos(x)**2)+ (poisson2-poisson1)/((1-(poisson2+poisson1)/2)**2)*(math.sin(x)**2)
+            return R
+        except ZeroDivisionError:
+            print('Zero division')
+            msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
+            
+        
    
     #####    Plot   #####
 
     def plot_graph(self,x,y):
-        #a = self.fig.add_subplot(1,1,1)
         a = self.fig.add_subplot(1,1,1)
         a.clear()
         a.plot(x,y)
@@ -206,6 +235,8 @@ class Graph(tk.Tk):
         a.set_xlabel('Incidence Angle(Degrees)')
         a.set_ylabel('Y')
         a.set_xticks([0, 10, 20, 30, 40, 50, 60, 70, 80 ,90])
+
+
         self.canvas.draw()
 
     #####   Menu Bar  ######
