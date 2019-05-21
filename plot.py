@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import math
+import numpy as np
 
 class Graph(tk.Tk):
     def __init__(self):
@@ -15,7 +16,7 @@ class Graph(tk.Tk):
         self.resizable(False, False) # disable resize window
         self.title("Graph GUI")
 
-        # Create Tap
+        # Create Tab
         self.tabControl = ttk.Notebook(self)
 
         # create tab1
@@ -132,13 +133,12 @@ class Graph(tk.Tk):
         self.total_zp2.grid(row=5, column=1)
 
         # show Rp
-        tk.Label(self.frame1, text="Rp :").grid(row=5, column=0)
+        tk.Label(self.frame1, text="Rp :").grid(row=6, column=0)
         self.rp = 0
         self.label_rp = IntVar()
         self.label_rp.set(self.rp)
         self.total_rp = tk.Label(self.frame1, textvariable=self.label_rp)
-        self.total_rp.grid(row=5, column=1)
-
+        self.total_rp.grid(row=6, column=1)
 
         # Button plot
         self.btn_plot = tk.Button(self.frame_layer2, text="Plot", command=self.getData, width=5)
@@ -150,56 +150,69 @@ class Graph(tk.Tk):
         self.canvas.get_tk_widget().grid(row=0, column=0)
         self.canvas.draw()
 
+        ##############     tab2      ########################
+        self.create_tab2()
+
+    def create_tab2(self):
+        self.big_frame2 = ttk.LabelFrame(self.tab2)
+        self.big_frame2.grid(row=0, column=0)
+        tk.Label(self.big_frame2, text="ddd").grid(row=0, column=0)
+
     #### get data from input #####
 
     def getData(self):
-        P1 = float(self.entry_P1.get())
-        D1 = float(self.entry_D1.get())
-        S1 = float(self.entry_S1.get())
+        try:
+            P1 = float(self.entry_P1.get())
+            D1 = float(self.entry_D1.get())
+            S1 = float(self.entry_S1.get())
 
-        P2 = float(self.entry_P2.get())
-        D2 = float(self.entry_D2.get())
-        S2 = float(self.entry_S2.get())
+            P2 = float(self.entry_P2.get())
+            D2 = float(self.entry_D2.get())
+            S2 = float(self.entry_S2.get())
 
-        # calculate poisson
-        self.poisson1 = self.cal_poisson(S1, P1)
-        self.label_poisson1.set(round(self.poisson1, 3))
+            # calculate poisson
+            self.poisson1 = self.cal_poisson(S1, P1)
+            self.label_poisson1.set(round(self.poisson1, 3))
 
-        self.poisson2 = self.cal_poisson(S2, P2)
-        self.label_poisson2.set(round(self.poisson2, 3))
+            self.poisson2 = self.cal_poisson(S2, P2)
+            self.label_poisson2.set(round(self.poisson2, 3))
 
-        # calculate Vp/Vs1
-        self.vp_vs1 = P1/S1
-        self.label_vp_vs1.set(round(self.vp_vs1, 3))
+            # calculate Vp/Vs1
+            self.vp_vs1 = P1/S1
+            self.label_vp_vs1.set(round(self.vp_vs1, 3))
 
-        self.vp_vs2 = P2/S2
-        self.label_vp_vs2.set(round(self.vp_vs2, 3))
+            self.vp_vs2 = P2/S2
+            self.label_vp_vs2.set(round(self.vp_vs2, 3))
 
-        # calculate Zp1
-        self.zp1 = D1*P1
-        self.label_zp1.set(round(self.zp1, 3))
+            # calculate Zp1
+            self.zp1 = D1*P1
+            self.label_zp1.set(round(self.zp1, 3))
 
-        self.zp2 = D2*P2
-        self.label_zp2.set(round(self.zp2, 3))
+            self.zp2 = D2*P2
+            self.label_zp2.set(round(self.zp2, 3))
 
-        #calculate reflection
-        data_x = []
-        data_y = []
-        for n in range(91):
-            t = math.pi
-            x = (n*t)/180 # radians
-            reflect = self.reflection(P1, D1, P2, D2, self.poisson1, self.poisson2, x)
-            data_x.append(float(reflect))
-            data_y.append(float(n))
-        #print(data_x)
-        #print(data_y)
+            #calculate reflection
+            data_x = []
+            data_y = []
+            for n in range(91):
+                t = math.pi
+                x = (n*t)/180 # radians
+                reflect = self.reflection(P1, D1, P2, D2, self.poisson1, self.poisson2, x)
+                data_x.append(float(reflect))
+                data_y.append(float(n))
+            #print(data_x)
+            #print(data_y)
 
-        # calculate rp
-        self.rp = data_x[0]
-        self.label_rp.set(round(self.rp, 3))
+            # calculate rp
+            self.rp = data_x[0]
+            self.label_rp.set(round(self.rp, 3))
         
-        # plot
-        self.plot_graph(data_y, data_x)
+            # plot
+            self.plot_graph(data_y, data_x)
+        except ValueError:
+            print('Please enter number into field')
+            msg.showwarning("Graph Warning","Please enter number into field !!!")
+
 
     ###########  Formula  ###########
     
@@ -222,8 +235,6 @@ class Graph(tk.Tk):
             print('Zero division')
             msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
             
-        
-   
     #####    Plot   #####
 
     def plot_graph(self,x,y):
@@ -235,8 +246,6 @@ class Graph(tk.Tk):
         a.set_xlabel('Incidence Angle(Degrees)')
         a.set_ylabel('Y')
         a.set_xticks([0, 10, 20, 30, 40, 50, 60, 70, 80 ,90])
-
-
         self.canvas.draw()
 
     #####   Menu Bar  ######
@@ -263,7 +272,6 @@ class Graph(tk.Tk):
 
     def _msg(self):
         msg.showinfo("Graph info","Program Plot Graph ")
-
         
 ####################
 #     STRAT GUI    #
