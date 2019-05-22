@@ -24,7 +24,7 @@ class Graph(tk.Tk):
         self.tabControl.add(self.tab1, text="AVO")
 
         self.tab2 = ttk.Frame(self.tabControl)
-        self.tabControl.add(self.tab2, text="tab2")
+        self.tabControl.add(self.tab2, text="Aki-Richards")
 
         self.tabControl.grid()
 
@@ -144,11 +144,13 @@ class Graph(tk.Tk):
         self.btn_plot = tk.Button(self.frame_layer2, text="Plot", command=self.getData, width=5)
         self.btn_plot.grid(row=6, column=1)
 
-        # fig 
-        self.fig = Figure(figsize=(5, 5))
+        # fig AVO
+        self.fig = Figure(figsize=(5,5))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.frame2)
         self.canvas.get_tk_widget().grid(row=0, column=0)
         self.canvas.draw()
+        
+       
 
         ##############     tab2      ########################
         self.create_tab2()
@@ -156,7 +158,13 @@ class Graph(tk.Tk):
     def create_tab2(self):
         self.big_frame2 = ttk.LabelFrame(self.tab2)
         self.big_frame2.grid(row=0, column=0)
-        tk.Label(self.big_frame2, text="ddd").grid(row=0, column=0)
+        tk.Label(self.big_frame2, text="").grid(row=0, column=0)
+
+         # fig Aki
+        self.fig2 = Figure(figsize=(5,5))
+        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.big_frame2)
+        self.canvas2.get_tk_widget().grid(row=1, column=0)
+        self.canvas2.draw()
 
     #### get data from input #####
 
@@ -191,24 +199,40 @@ class Graph(tk.Tk):
             self.zp2 = D2*P2
             self.label_zp2.set(round(self.zp2, 3))
 
+            # Calculate A, B, C from Aki-Richards
+            A = self.cal_A(P1, P2, D1, D2)
+            B = self.cal_B(P1, P2, D1, D2, S1, S2)
+            C = self.cal_C(P1, P2)
+
             #calculate reflection
-            data_x = []
-            data_y = []
+            self.data_x = [] # data in AVO
+            self.data_y = [] # data in Avo
+            data_x_aki = [] # data in Aki
+            data_y_aki = [] # data in Aki
             for n in range(91):
                 t = math.pi
                 x = (n*t)/180 # radians
+                # AVO
                 reflect = self.reflection(P1, D1, P2, D2, self.poisson1, self.poisson2, x)
-                data_x.append(float(reflect))
-                data_y.append(float(n))
-            #print(data_x)
-            #print(data_y)
+                self.data_x.append(float(reflect))
+                self.data_y.append(float(n))
+            # Aki
+            for i in range(80):
+                t = math.pi
+                x = (i*t)/180
+                aki = self.reflaction_aki(A, B, C, x)
+                data_x_aki.append(float(aki))
+                data_y_aki.append(float(i))
 
             # calculate rp
-            self.rp = data_x[0]
+            self.rp = self.data_x[0]
             self.label_rp.set(round(self.rp, 3))
         
-            # plot
-            self.plot_graph(data_y, data_x)
+            # plot AVO
+            self.plot_graph(self.data_y, self.data_x)
+
+            #plot Aki
+            self.plot_aki(data_y_aki, data_x_aki)
         except ValueError:
             print('Please enter number into field')
             msg.showwarning("Graph Warning","Please enter number into field !!!")
@@ -225,28 +249,90 @@ class Graph(tk.Tk):
             print('Zero division')
             msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
         
-
     def reflection(self, P1, D1, P2, D2, poisson1, poisson2, x):
-        # R = ((P2*D2 - P1*D1)/(P2*D2 + P1*D1))*(cos(x)^2)+ (poisson2-poisson1)/((1-(poisson2+poisson1)/2)^2)*(sin(x)^2)
+        ''' AVO Approximation'''
+        
         try:   
             R = ((P2*D2 - P1*D1)/(P2*D2 + P1*D1))*(math.cos(x)**2)+ (poisson2-poisson1)/((1-(poisson2+poisson1)/2)**2)*(math.sin(x)**2)
             return R
         except ZeroDivisionError:
             print('Zero division')
             msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
-            
+     
+    def reflaction_aki(self, A, B, C, theta):
+        # r = A+ Bsin^2(theta) + Csin^2(theta)*tan^2(theta)
+        try:
+            R = A + (B*(math.sin(theta)**2)) + (C * (math.sin(theta)**2)*(math.tan(theta)**2))
+            return R
+        except ZeroDivisionError:
+            print('Zero division')
+            msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
+
+    def cal_A(self, P1, P2, D1, D2):
+        # A = 0.5 * (((P2-P1)/Pavg)+ ((D2-D1)/Davg))
+        try:
+            Pavg = (P1 + P2) / 2
+            Davg = (D1 + D2) / 2
+            A = 0.5 * (((P2-P1)/Pavg)+ ((D2-D1)/Davg))
+            return A
+        except ZeroDivisionError:
+            print('Zero division')
+            msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
+    
+    def cal_B(self, P1, P2, D1, D2, S1, S2):
+        # B = 0.5*((P2-P1)/Pavg) - 2*((Savg/Pavg)**2)*(2*((S2-S1)/Savg)+(D2-D1)/Davg)
+        try:
+            Pavg = (P1 + P2) / 2
+            Davg = (D1 + D2) / 2
+            Savg = (S1 + S2) / 2
+            B = 0.5*((P2-P1)/Pavg) - 2*((Savg/Pavg)**2)*(2*((S2-S1)/Savg)+(D2-D1)/Davg)
+            return B
+        except ZeroDivisionError:
+            print('Zero division')
+            msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
+
+    def cal_C(self, P1, P2):
+        # C = 0.5 * (P2-P1)/Pavg
+        try:
+            Pavg = (P1 + P2) / 2 
+            C = 0.5 * (P2-P1)/Pavg
+            return C
+        except ZeroDivisionError:
+            print('Zero division')
+            msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
+
+
     #####    Plot   #####
 
     def plot_graph(self,x,y):
+        # AVO
         a = self.fig.add_subplot(1,1,1)
         a.clear()
-        a.plot(x,y)
+        a.plot(x,y,label=r'$R(\theta) = \frac{\rho_2 V_2 - \rho_1 V_1}{\rho_2 V_2 + \rho_1 V_1}\cos^2(\theta) + \frac{\sigma_2 - \sigma_1}{(1 - \sigma_{avr})^2}\sin^2(\theta)$')
+        a.legend()
         a.grid(True)
         a.set_title('Shuey(AVO) Approximation')
-        a.set_xlabel('Incidence Angle(Degrees)')
-        a.set_ylabel('Y')
-        a.set_xticks([0, 10, 20, 30, 40, 50, 60, 70, 80 ,90])
+        a.set_xlabel('Incidence Angle(Degrees)', fontsize=8)
+        a.set_ylabel('Amplitude', fontsize=8)
+        a.tick_params(axis="y", labelsize=8, rotation=90)
+        a.tick_params(axis="x", labelsize=8)
+        
+
         self.canvas.draw()
+
+    def plot_aki(self,x,y):
+        # Aki
+        b = self.fig2.add_subplot(111)
+        b.clear()
+        b.plot(x,y)
+        b.set_title('Aki-Richards Approximation')
+        b.set_xlabel('Incidence Angle(Degrees)', fontsize=8)
+        b.set_ylabel('Reflection Coefficient', fontsize=8)
+        b.grid(True)
+        b.tick_params(axis="y", labelsize=8, rotation=90)
+        b.tick_params(axis="x", labelsize=8)
+        b.set_xticks([0, 10, 20, 30, 40, 50, 60, 70, 80 ,90])
+        self.canvas2.draw()
 
     #####   Menu Bar  ######
 
