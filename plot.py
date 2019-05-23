@@ -360,7 +360,7 @@ class Graph(tk.Tk):
         self.a.plot(aki_x, aki_y, label='Aki-Richards')
         self.a.legend()
         self.a.grid(True)
-        self.a.set_title('Shuey(AVO) Approximation')
+        self.a.set_title('Shuey(AVO) and Aki-Richards Approximation')
         self.a.set_xlabel('Incidence Angle(Degrees)', fontsize=8)
         self.a.set_ylabel('Amplitude', fontsize=8)
         self.a.tick_params(axis="y", labelsize=8, rotation=90)
@@ -405,7 +405,7 @@ class Graph(tk.Tk):
     def Change_axis(self,start_y, stop_y, data_x_aki, data_y_aki):
         step = float(self.step.get())
         total_y = []
-        if start_y == int(0):
+        if start_y == int(0) and stop_y == int(0):
             self.plot_graph(self.data_x, self.data_y, data_x_aki, data_y_aki)
         else:
             
