@@ -24,7 +24,7 @@ class Graph(tk.Tk):
         self.tabControl.add(self.tab1, text="AVO")
 
         self.tab2 = ttk.Frame(self.tabControl)
-        self.tabControl.add(self.tab2, text="Aki-Richards")
+        self.tabControl.add(self.tab2, text="Tab2")
 
         self.tabControl.grid()
 
@@ -52,6 +52,10 @@ class Graph(tk.Tk):
         # Frame Figure
         self.frame2 = ttk.LabelFrame(self.big_frame)
         self.frame2.grid(row=0, column=0, padx=10, pady=5)
+
+        # Frame Change Scope axis
+        self.frame_axis = ttk.LabelFrame(self.frame_input, text='Change Axis')
+        self.frame_axis.grid(row=2, column=0)
 
         # Add widget #
         #### input box  #####
@@ -85,7 +89,28 @@ class Graph(tk.Tk):
         tk.Label(self.frame_layer2, text='S-Wave1 :').grid(row=2, column=0)
         self.entry_S2 = tk.Entry(self.frame_layer2, bd=3, width=5)
         self.entry_S2.grid(row=2, column=1)
-    
+
+        # Axis default
+        self.axis_default = 0
+        self.axis_value_start = IntVar() # default start
+        self.axis_value_start.set(self.axis_default)
+        self.axis_value_stop = IntVar() # default  stop
+        self.axis_value_stop.set(self.axis_default)
+        # start
+        tk.Label(self.frame_axis, text='Y :').grid(row=0, column=0)
+        self.start_axis_y = tk.Entry(self.frame_axis, textvariable=self.axis_value_start,bd=3, width=5)
+        self.start_axis_y.grid(row=0, column=1)
+        # stop
+        tk.Label(self.frame_axis, text=' to ').grid(row=0, column=2)
+        self.stop_axis_y = tk.Entry(self.frame_axis, textvariable=self.axis_value_stop, bd=3, width=5)
+        self.stop_axis_y.grid(row=0, column=3)
+        
+        # step
+        self.default_step = IntVar()
+        self.default_step.set(1)
+        tk.Label(self.frame_axis, text='Step : ').grid(row=1,column=0)
+        self.step = tk.Entry(self.frame_axis, textvariable=self.default_step, bd=3, width=5)
+        self.step.grid(row=1, column=1)
 
         # show poisson into GUI
         tk.Label(self.frame1, text="Poisson's ratio 1: ").grid(row=3, column=0)
@@ -150,21 +175,39 @@ class Graph(tk.Tk):
         self.canvas.get_tk_widget().grid(row=0, column=0)
         self.canvas.draw()
         
+        
        
 
         ##############     tab2      ########################
         self.create_tab2()
 
     def create_tab2(self):
+        ###### Create Frame   #########
         self.big_frame2 = ttk.LabelFrame(self.tab2)
         self.big_frame2.grid(row=0, column=0)
-        tk.Label(self.big_frame2, text="").grid(row=0, column=0)
+        tk.Label(self.big_frame2, text="")
+
+        # Fig frame
+        self.fig_frame_tab2 = ttk.LabelFrame(self.big_frame2)
+        self.big_frame2.grid(row=0, column=0) 
+        
+        # input frame
+        self.frame_input_tab2 = ttk.LabelFrame(self.big_frame2)
+        self.frame_input_tab2.grid(row=0, column=1)
+        tk.Label(self.frame_input_tab2, text="Input")
+
+        # input frame layer1
+        self.layer1_frame_tab2 = ttk.LabelFrame(self.frame_input_tab2)
+        self.layer1_frame_tab2.grid(row=0, column=0)
+        tk.Label(self.layer1_frame_tab2, text="Layer 1")
+
+
 
          # fig Aki
-        self.fig2 = Figure(figsize=(5,5))
-        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.big_frame2)
-        self.canvas2.get_tk_widget().grid(row=1, column=0)
-        self.canvas2.draw()
+        # self.fig2 = Figure(figsize=(5,5))
+        # self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.big_frame2)
+        # self.canvas2.get_tk_widget().grid(row=1, column=0)
+        # self.canvas2.draw()
 
     #### get data from input #####
 
@@ -177,6 +220,9 @@ class Graph(tk.Tk):
             P2 = float(self.entry_P2.get())
             D2 = float(self.entry_D2.get())
             S2 = float(self.entry_S2.get())
+
+            start_y = int(self.start_axis_y.get())
+            stop_y = int(self.stop_axis_y.get())
 
             # calculate poisson
             self.poisson1 = self.cal_poisson(S1, P1)
@@ -214,25 +260,27 @@ class Graph(tk.Tk):
                 x = (n*t)/180 # radians
                 # AVO
                 reflect = self.reflection(P1, D1, P2, D2, self.poisson1, self.poisson2, x)
-                self.data_x.append(float(reflect))
-                self.data_y.append(float(n))
+                self.data_y.append(float(reflect))
+                self.data_x.append(float(n))
+
+                
             # Aki
             for i in range(80):
                 t = math.pi
                 x = (i*t)/180
                 aki = self.reflaction_aki(A, B, C, x)
-                data_x_aki.append(float(aki))
-                data_y_aki.append(float(i))
+                data_y_aki.append(float(aki))
+                data_x_aki.append(float(i))
 
-            # calculate rp
+            # calculate and show rp
             self.rp = self.data_x[0]
             self.label_rp.set(round(self.rp, 3))
         
             # plot AVO
-            self.plot_graph(self.data_y, self.data_x)
-
+            #self.plot_graph(self.data_x, self.data_y, data_x_aki, data_y_aki)
+            self.Change_axis(start_y, stop_y, data_x_aki,data_y_aki) 
             #plot Aki
-            self.plot_aki(data_y_aki, data_x_aki)
+            #self.plot_aki(data_x_aki, data_y_aki)
         except ValueError:
             print('Please enter number into field')
             msg.showwarning("Graph Warning","Please enter number into field !!!")
@@ -303,20 +351,40 @@ class Graph(tk.Tk):
 
 
     #####    Plot   #####
+    def plot_graph_change_axis(self,x,y,aki_x,aki_y,tick_y):
+        self.a = self.fig.add_subplot(1,1,1)
+        self.a.clear()
 
-    def plot_graph(self,x,y):
+        self.a.plot(x,y, label='AVO')
+
+        self.a.plot(aki_x, aki_y, label='Aki-Richards')
+        self.a.legend()
+        self.a.grid(True)
+        self.a.set_title('Shuey(AVO) Approximation')
+        self.a.set_xlabel('Incidence Angle(Degrees)', fontsize=8)
+        self.a.set_ylabel('Amplitude', fontsize=8)
+        self.a.tick_params(axis="y", labelsize=8, rotation=90)
+        self.a.tick_params(axis="x", labelsize=8)
+        self.a.set_yticks(tick_y)
+        self.canvas.draw()
+
+    def plot_graph(self,x,y,aki_x,aki_y):
         # AVO
-        a = self.fig.add_subplot(1,1,1)
-        a.clear()
-        a.plot(x,y,label=r'$R(\theta) = \frac{\rho_2 V_2 - \rho_1 V_1}{\rho_2 V_2 + \rho_1 V_1}\cos^2(\theta) + \frac{\sigma_2 - \sigma_1}{(1 - \sigma_{avr})^2}\sin^2(\theta)$')
-        a.legend()
-        a.grid(True)
-        a.set_title('Shuey(AVO) Approximation')
-        a.set_xlabel('Incidence Angle(Degrees)', fontsize=8)
-        a.set_ylabel('Amplitude', fontsize=8)
-        a.tick_params(axis="y", labelsize=8, rotation=90)
-        a.tick_params(axis="x", labelsize=8)
-        
+        #all_y = self.Change_axis()
+        self.a = self.fig.add_subplot(1,1,1)
+        self.a.clear()
+        #a.plot(x,y,label=r'$R(\theta) = \frac{\rho_2 V_2 - \rho_1 V_1}{\rho_2 V_2 + \rho_1 V_1}\cos^2(\theta) + \frac{\sigma_2 - \sigma_1}{(1 - \sigma_{avr})^2}\sin^2(\theta)$')
+        self.a.plot(x,y, label='AVO')
+
+        self.a.plot(aki_x, aki_y, label='Aki-Richards')
+        self.a.legend()
+        self.a.grid(True)
+        self.a.set_title('Shuey(AVO) and Aki-Richards Approximation')
+        self.a.set_xlabel('Incidence Angle(Degrees)', fontsize=8)
+        self.a.set_ylabel('Amplitude', fontsize=8)
+        self.a.tick_params(axis="y", labelsize=8, rotation=90)
+        self.a.tick_params(axis="x", labelsize=8)
+        #a.set_yticks(all_y)
 
         self.canvas.draw()
 
@@ -333,6 +401,37 @@ class Graph(tk.Tk):
         b.tick_params(axis="x", labelsize=8)
         b.set_xticks([0, 10, 20, 30, 40, 50, 60, 70, 80 ,90])
         self.canvas2.draw()
+
+    def Change_axis(self,start_y, stop_y, data_x_aki, data_y_aki):
+        step = float(self.step.get())
+        total_y = []
+        if start_y == int(0):
+            self.plot_graph(self.data_x, self.data_y, data_x_aki, data_y_aki)
+        else:
+            
+            for i in self.frange(start_y, stop_y+1,step):
+                total_y.append(float(i))
+            self.plot_graph_change_axis(self.data_x, self.data_y, data_x_aki, data_y_aki,total_y)
+        
+
+    def frange(self,start, stop=None, step=None):
+        #Use float number in range() function
+        # if stop and step argument is null set start=0.0 and step = 1.0
+        if stop == None:
+            stop = start + 0.0
+            start = 0.0
+        if step == None:
+            step = 1.0
+        while True:
+            if step > 0 and start >= stop:
+                break
+            elif step < 0 and start <= stop:
+                break
+            yield ("%g" % start) # return float number
+            start = start + step
+
+
+
 
     #####   Menu Bar  ######
 
