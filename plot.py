@@ -59,7 +59,6 @@ class Graph(tk.Tk):
 
         # Add widget #
         #### input box  #####
-
         # P-Wave 1
         tk.Label(self.frame1, text='P-Wave Velocity1 :').grid(row=0, column=0)
         self.entry_P1 = tk.Entry(self.frame1, bd=3, width=5)
@@ -175,8 +174,6 @@ class Graph(tk.Tk):
         self.canvas.get_tk_widget().grid(row=0, column=0)
         self.canvas.draw()
         
-        
-       
 
         ##############     tab2      ########################
         self.create_tab2()
@@ -200,8 +197,6 @@ class Graph(tk.Tk):
         self.layer1_frame_tab2 = ttk.LabelFrame(self.frame_input_tab2)
         self.layer1_frame_tab2.grid(row=0, column=0)
         tk.Label(self.layer1_frame_tab2, text="Layer 1")
-
-
 
          # fig Aki
         # self.fig2 = Figure(figsize=(5,5))
@@ -262,7 +257,6 @@ class Graph(tk.Tk):
                 reflect = self.reflection(P1, D1, P2, D2, self.poisson1, self.poisson2, x)
                 self.data_y.append(float(reflect))
                 self.data_x.append(float(n))
-
                 
             # Aki
             for i in range(80):
@@ -273,18 +267,16 @@ class Graph(tk.Tk):
                 data_x_aki.append(float(i))
 
             # calculate and show rp
-            self.rp = self.data_x[0]
+            self.rp = self.data_y[0]
             self.label_rp.set(round(self.rp, 3))
         
             # plot AVO
-            #self.plot_graph(self.data_x, self.data_y, data_x_aki, data_y_aki)
             self.Change_axis(start_y, stop_y, data_x_aki,data_y_aki) 
             #plot Aki
             #self.plot_aki(data_x_aki, data_y_aki)
         except ValueError:
             print('Please enter number into field')
             msg.showwarning("Graph Warning","Please enter number into field !!!")
-
 
     ###########  Formula  ###########
     
@@ -299,7 +291,6 @@ class Graph(tk.Tk):
         
     def reflection(self, P1, D1, P2, D2, poisson1, poisson2, x):
         ''' AVO Approximation'''
-        
         try:   
             R = ((P2*D2 - P1*D1)/(P2*D2 + P1*D1))*(math.cos(x)**2)+ (poisson2-poisson1)/((1-(poisson2+poisson1)/2)**2)*(math.sin(x)**2)
             return R
@@ -349,8 +340,8 @@ class Graph(tk.Tk):
             print('Zero division')
             msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
 
-
     #####    Plot   #####
+
     def plot_graph_change_axis(self,x,y,aki_x,aki_y,tick_y):
         self.a = self.fig.add_subplot(1,1,1)
         self.a.clear()
@@ -370,7 +361,6 @@ class Graph(tk.Tk):
 
     def plot_graph(self,x,y,aki_x,aki_y):
         # AVO
-        #all_y = self.Change_axis()
         self.a = self.fig.add_subplot(1,1,1)
         self.a.clear()
         #a.plot(x,y,label=r'$R(\theta) = \frac{\rho_2 V_2 - \rho_1 V_1}{\rho_2 V_2 + \rho_1 V_1}\cos^2(\theta) + \frac{\sigma_2 - \sigma_1}{(1 - \sigma_{avr})^2}\sin^2(\theta)$')
@@ -384,8 +374,6 @@ class Graph(tk.Tk):
         self.a.set_ylabel('Amplitude', fontsize=8)
         self.a.tick_params(axis="y", labelsize=8, rotation=90)
         self.a.tick_params(axis="x", labelsize=8)
-        #a.set_yticks(all_y)
-
         self.canvas.draw()
 
     def plot_aki(self,x,y):
@@ -429,9 +417,6 @@ class Graph(tk.Tk):
                 break
             yield ("%g" % start) # return float number
             start = start + step
-
-
-
 
     #####   Menu Bar  ######
 
