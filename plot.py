@@ -16,6 +16,9 @@ class Graph(tk.Tk):
         self.resizable(False, False) # disable resize window
         self.title("Graph GUI")
 
+        # Add icon
+        self.iconbitmap('Picture/logo.ico')
+
         # Create Tab
         self.tabControl = ttk.Notebook(self)
 
