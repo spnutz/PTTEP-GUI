@@ -3,6 +3,7 @@ from tkinter import Menu
 from tkinter import messagebox as msg
 from tkinter import ttk
 from tkinter import IntVar
+from PIL import ImageTk, Image
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -42,15 +43,15 @@ class Graph(tk.Tk):
         self.big_frame.grid(column=0, row=0)
 
         # Frame input
-        self.frame_input = ttk.LabelFrame(self.big_frame, text="input")
+        self.frame_input = ttk.LabelFrame(self.big_frame)
         self.frame_input.grid(row=0, column=1)
 
 
         self.frame1 = ttk.LabelFrame(self.frame_input, text="Layer 1")
-        self.frame1.grid(row=0, column=0, padx=20, pady=20)
+        self.frame1.grid(row=1, column=0, padx=20, pady=20)
 
         self.frame_layer2 = ttk.LabelFrame(self.frame_input, text="Layer 2")
-        self.frame_layer2.grid(row=1, column=0, padx=20, pady=20)
+        self.frame_layer2.grid(row=2, column=0, padx=20, pady=20)
 
         # Frame Figure
         self.frame2 = ttk.LabelFrame(self.big_frame)
@@ -58,7 +59,13 @@ class Graph(tk.Tk):
 
         # Frame Change Scope axis
         self.frame_axis = ttk.LabelFrame(self.frame_input, text='Change Axis')
-        self.frame_axis.grid(row=2, column=0)
+        self.frame_axis.grid(row=3, column=0)
+
+        # Add logo PTTEP
+        self.img = ImageTk.PhotoImage(Image.open("Picture/icon.png"))
+        self.panel = ttk.Label(self.frame_input, image= self.img)
+        self.panel.grid(row=0, column=0) 
+
 
         # Add widget #
         #### input box  #####
@@ -172,14 +179,19 @@ class Graph(tk.Tk):
         self.btn_plot.grid(row=6, column=1)
 
         # fig AVO
-        self.fig = Figure(figsize=(5,5))
+        self.fig = Figure(figsize=(5,5.5))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.frame2)
         self.canvas.get_tk_widget().grid(row=0, column=0)
         self.canvas.draw()
         
+        # add Fig Layer
+        self.layer_img = ImageTk.PhotoImage(Image.open("Picture/layer.png"))
+        self.panel_layer_img = ttk.Label(self.frame2, image=self.layer_img)
+        self.panel_layer_img.grid(row = 1 ,column=0)
 
         ##############     tab2      ########################
         self.create_tab2()
+
 
     def create_tab2(self):
         ###### Create Frame   #########
@@ -187,26 +199,29 @@ class Graph(tk.Tk):
         self.big_frame2.grid(row=0, column=0)
         tk.Label(self.big_frame2, text="")
 
-        # Fig frame
-        self.fig_frame_tab2 = ttk.LabelFrame(self.big_frame2)
-        self.big_frame2.grid(row=0, column=0) 
+         # fig tab2
+        self.fig2 = Figure(figsize=(8,3))
+        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.big_frame2)
+        self.canvas2.get_tk_widget().grid(row=1, column=0)
+        self.canvas2.draw() 
+
+  
+    def plot_graph_tab2(self,Vs1,Vp1,D1):
+        ax1 = self.fig2.add_subplot(1,3,1)
+        ax1.clear()
+        ax1.set_xlabel('Density')
+        ax1.set_ylabel('Vs')
+       
+        ax2 = ax1.twinx()
+        ax2.clear()
+        ax2.set_ylabel('Vp')
+
+        ax1.plot(D1,Vs1, marker='o')
+        ax2.plot(D1,Vp1, marker='o')
+
+        self.fig2.tight_layout()
+        self.canvas2.draw()
         
-        # input frame
-        self.frame_input_tab2 = ttk.LabelFrame(self.big_frame2)
-        self.frame_input_tab2.grid(row=0, column=1)
-        tk.Label(self.frame_input_tab2, text="Input")
-
-        # input frame layer1
-        self.layer1_frame_tab2 = ttk.LabelFrame(self.frame_input_tab2)
-        self.layer1_frame_tab2.grid(row=0, column=0)
-        tk.Label(self.layer1_frame_tab2, text="Layer 1")
-
-         # fig Aki
-        # self.fig2 = Figure(figsize=(5,5))
-        # self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.big_frame2)
-        # self.canvas2.get_tk_widget().grid(row=1, column=0)
-        # self.canvas2.draw()
-
     #### get data from input #####
 
     def getData(self):
@@ -221,6 +236,11 @@ class Graph(tk.Tk):
 
             start_y = int(self.start_axis_y.get())
             stop_y = int(self.stop_axis_y.get())
+
+            # Sent data to tab2
+            self.Vp1 = P1
+            self.Vs1 = S1
+            self.D1 = D1
 
             # calculate poisson
             self.poisson1 = self.cal_poisson(S1, P1)
@@ -274,7 +294,8 @@ class Graph(tk.Tk):
             self.label_rp.set(round(self.rp, 3))
         
             # plot AVO
-            self.Change_axis(start_y, stop_y, data_x_aki,data_y_aki) 
+            self.Change_axis(start_y, stop_y, data_x_aki,data_y_aki)
+            self.plot_graph_tab2(self.Vs1, self.Vp1, self.D1) 
             #plot Aki
             #self.plot_aki(data_x_aki, data_y_aki)
         except ValueError:
@@ -360,6 +381,8 @@ class Graph(tk.Tk):
         self.a.tick_params(axis="y", labelsize=8, rotation=90)
         self.a.tick_params(axis="x", labelsize=8)
         self.a.set_yticks(tick_y)
+
+        self.fig.tight_layout()
         self.canvas.draw()
 
     def plot_graph(self,x,y,aki_x,aki_y):
@@ -377,6 +400,7 @@ class Graph(tk.Tk):
         self.a.set_ylabel('Amplitude', fontsize=8)
         self.a.tick_params(axis="y", labelsize=8, rotation=90)
         self.a.tick_params(axis="x", labelsize=8)
+        self.fig.tight_layout()
         self.canvas.draw()
 
     def plot_aki(self,x,y):
