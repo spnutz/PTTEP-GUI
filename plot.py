@@ -42,28 +42,59 @@ class Graph(tk.Tk):
         self.big_frame = ttk.LabelFrame(self.tab1)
         self.big_frame.grid(column=0, row=0)
 
-        # Frame input
-        self.frame_input = ttk.LabelFrame(self.big_frame)
-        self.frame_input.grid(row=0, column=1)
+        # Logo frame
+        self.logo_frame = ttk.LabelFrame(self.big_frame)
+        self.logo_frame.grid(row=0, column=1)
+
+        ################################### Frame input ###################################
+        self.frame_input = ttk.LabelFrame(self.logo_frame)
+        self.frame_input.grid(row=1, column=0)
+        
+        self.frame_gas = ttk.LabelFrame(self.frame_input, text="Gas")
+        self.frame_gas.grid(row=0, column=0)
+
+        self.frame_water = ttk.LabelFrame(self.frame_input, text="Water")
+        self.frame_water.grid(row=0, column=1)
+
+        self.frame_oil = ttk.LabelFrame(self.frame_input, text="Oil")
+        self.frame_oil.grid(row=0, column=2)
+
+        # gas case
+        self.frame1 = ttk.LabelFrame(self.frame_gas, text="Layer 1")
+        self.frame1.grid(row=1, column=0, padx=20)
+        
+        self.frame_layer2 = ttk.LabelFrame(self.frame_gas, text="Layer 2")
+        self.frame_layer2.grid(row=2, column=0, padx=20)
+
+        # water case
+        self.frame_layer1_water = ttk.LabelFrame(self.frame_water, text="Layer 1")
+        self.frame_layer1_water.grid(row=0, column=0)
+
+        self.frame_layer2_water = ttk.LabelFrame(self.frame_water, text="Layer 2")
+        self.frame_layer2_water.grid(row=1, column=0)
+
+        # oil case
+        self.frame_layer1_oil = ttk.LabelFrame(self.frame_oil, text="Layer 1")
+        self.frame_layer1_oil.grid(row=0, column=0)
+
+        self.frame_layer2_oil = ttk.LabelFrame(self.frame_oil, text="Layer 2")
+        self.frame_layer2_oil.grid(row=1, column=0)
 
 
-        self.frame1 = ttk.LabelFrame(self.frame_input, text="Layer 1")
-        self.frame1.grid(row=1, column=0, padx=20, pady=20)
 
-        self.frame_layer2 = ttk.LabelFrame(self.frame_input, text="Layer 2")
-        self.frame_layer2.grid(row=2, column=0, padx=20, pady=20)
+        ##################################################################################
 
         # Frame Figure
         self.frame2 = ttk.LabelFrame(self.big_frame)
         self.frame2.grid(row=0, column=0, padx=10, pady=5)
 
-        # Frame Change Scope axis
+        # Frame Change Scope axis 
         self.frame_axis = ttk.LabelFrame(self.frame_input, text='Change Axis')
         self.frame_axis.grid(row=3, column=0)
 
         # Add logo PTTEP
         self.img = ImageTk.PhotoImage(Image.open("Picture/icon.png"))
-        self.panel = ttk.Label(self.frame_input, image= self.img)
+        self.panel = ttk.Label(self.logo_frame, image= self.img)
         self.panel.grid(row=0, column=0, padx=20) 
 
 
@@ -160,9 +191,9 @@ class Graph(tk.Tk):
         self.total_zp1.grid(row=5, column=1)
 
         tk.Label(self.frame_layer2, text="Zp2 :").grid(row=5, column=0)
-        self.zp1 = 0
+        self.zp2 = 0
         self.label_zp2 = IntVar()
-        self.label_zp2.set(self.zp1)
+        self.label_zp2.set(self.zp2)
         self.total_zp2 = tk.Label(self.frame_layer2, textvariable=self.label_zp2)
         self.total_zp2.grid(row=5, column=1)
 
@@ -179,7 +210,7 @@ class Graph(tk.Tk):
         self.btn_plot.grid(row=6, column=1)
 
         # fig AVO
-        self.fig = Figure(figsize=(5,5.5))
+        self.fig = Figure(figsize=(5,5.15))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.frame2)
         self.canvas.get_tk_widget().grid(row=0, column=0)
         self.canvas.draw()
@@ -188,6 +219,168 @@ class Graph(tk.Tk):
         self.layer_img = ImageTk.PhotoImage(Image.open("Picture/layer.png"))
         self.panel_layer_img = ttk.Label(self.frame2, image=self.layer_img)
         self.panel_layer_img.grid(row = 1 ,column=0)
+
+        ############ water input ############
+        ##### Layer 1
+        # P-Wave 1
+        tk.Label(self.frame_layer1_water, text="P-Wave Velocity1 :").grid(row=0, column=0)
+        self.entry_P1_water = tk.Entry(self.frame_layer1_water, bd=3, width=5)
+        self.entry_P1_water.grid(row=0, column=1)
+        # Density 1
+        tk.Label(self.frame_layer1_water, text='Density1 :').grid(row=1, column=0)
+        self.entry_D1_water = tk.Entry(self.frame_layer1_water, bd=3, width=5)
+        self.entry_D1_water.grid(row=1, column=1)
+        # S-Wave 1
+        tk.Label(self.frame_layer1_water, text='S-Wave1 :').grid(row=2, column=0)
+        self.entry_S1_water = tk.Entry(self.frame_layer1_water, bd=3, width=5)
+        self.entry_S1_water.grid(row=2, column=1)
+        # show poisson 1
+        tk.Label(self.frame_layer1_water, text="Poisson's ratio 1: ").grid(row=3, column=0)
+        self.poisson1_water =0
+        self.label_poisson1_water = IntVar()
+        self.label_poisson1_water.set(self.poisson1_water)
+        self.total_s_water = tk.Label(self.frame_layer1_water, textvariable=self.label_poisson1_water)
+        self.total_s_water.grid(row=3, column=1)
+        # show Vp/Vs
+        tk.Label(self.frame_layer1_water, text="Vp/Vs :").grid(row=4, column=0)
+        self.vp_vs1_water = 0
+        self.label_vp_vs1_water = IntVar()
+        self.label_vp_vs1_water.set(self.vp_vs1_water)
+        self.total_vp_vs1_water = tk.Label(self.frame_layer1_water, textvariable=self.label_vp_vs1_water)
+        self.total_vp_vs1_water.grid(row=4, column=1)
+        # show Zp1
+        tk.Label(self.frame_layer1_water, text="Zp1 :").grid(row=5, column=0)
+        self.zp1_water = 0
+        self.label_zp1_water = IntVar()
+        self.label_zp1_water.set(self.zp1_water)
+        self.total_zp1_water = tk.Label(self.frame_layer1_water, textvariable=self.label_zp1_water)
+        self.total_zp1_water.grid(row=5, column=1)
+        # show Rp
+        tk.Label(self.frame_layer1_water, text="Rp :").grid(row=6, column=0)
+        self.rp_water = 0
+        self.label_rp_water = IntVar()
+        self.label_rp_water.set(self.rp)
+        self.total_rp_water = tk.Label(self.frame_layer1_water, textvariable=self.label_rp_water)
+        self.total_rp_water.grid(row=6, column=1)
+
+        ##### Layer 2
+        # P-Wave 2
+        tk.Label(self.frame_layer2_water, text='P-Wave Velocity2 :').grid(row=0, column=0)
+        self.entry_P2_water = tk.Entry(self.frame_layer2_water, bd=3, width=5)
+        self.entry_P2_water.grid(row=0, column=1)
+        # Density 2
+        tk.Label(self.frame_layer2_water, text='Density2 :').grid(row=1, column=0)
+        self.entry_D2_water = tk.Entry(self.frame_layer2_water, bd=3, width=5)
+        self.entry_D2_water.grid(row=1, column=1)
+        # S-Wave2
+        tk.Label(self.frame_layer2_water, text='S-Wave2 :').grid(row=2, column=0)
+        self.entry_S2_water = tk.Entry(self.frame_layer2_water, bd=3, width=5)
+        self.entry_S2_water.grid(row=2, column=1)
+        # show poisson 2
+        tk.Label(self.frame_layer2_water, text="Poisson's ratio 2 :").grid(row=3, column=0)
+        self.poisson2_water =0
+        self.label_poisson2_water = IntVar()
+        self.label_poisson2_water.set(self.poisson2_water)
+        self.total_poisson2_water = tk.Label(self.frame_layer2_water, textvariable=self.label_poisson2_water)
+        self.total_poisson2_water.grid(row=3, column=1)
+        # show Vp/Vs 2
+        tk.Label(self.frame_layer2_water, text="Vp/Vs :").grid(row=4, column=0)
+        self.vp_vs2_water = 0
+        self.label_vp_vs2_water = IntVar()
+        self.label_vp_vs2_water.set(self.vp_vs2_water)
+        self.total_vp_vs2_water = tk.Label(self.frame_layer2_water, textvariable=self.label_vp_vs2_water)
+        self.total_vp_vs2_water.grid(row=4, column=1)
+        # show Zp2
+        tk.Label(self.frame_layer2_water, text="Zp2 :").grid(row=5, column=0)
+        self.zp2_water = 0
+        self.label_zp2_water = IntVar()
+        self.label_zp2_water.set(self.zp2_water)
+        self.total_zp2_water = tk.Label(self.frame_layer2_water, textvariable=self.label_zp2_water)
+        self.total_zp2_water.grid(row=5, column=1)
+
+        ######################  oil input  ######################
+        ### Layer 1
+        # P-Wave 1
+        tk.Label(self.frame_layer1_oil, text="P-Wave Velocity1 :").grid(row=0, column=0)
+        self.entry_P1_oil = tk.Entry(self.frame_layer1_oil, bd=3, width=5)
+        self.entry_P1_oil.grid(row=0, column=1)
+        # Density 1
+        tk.Label(self.frame_layer1_oil, text='Density1 :').grid(row=1, column=0)
+        self.entry_D1_oil = tk.Entry(self.frame_layer1_oil, bd=3, width=5)
+        self.entry_D1_oil.grid(row=1, column=1)
+        # S-Wave 1
+        tk.Label(self.frame_layer1_oil, text='S-Wave1 :').grid(row=2, column=0)
+        self.entry_S1_oil = tk.Entry(self.frame_layer1_oil, bd=3, width=5)
+        self.entry_S1_oil.grid(row=2, column=1)
+        # show poisson 1
+        tk.Label(self.frame_layer1_oil, text="Poisson's ratio 1: ").grid(row=3, column=0)
+        self.poisson1_oil =0
+        self.label_poisson1_oil = IntVar()
+        self.label_poisson1_oil.set(self.poisson1_oil)
+        self.total_s_oil = tk.Label(self.frame_layer1_oil, textvariable=self.label_poisson1_oil)
+        self.total_s_oil.grid(row=3, column=1)
+        # show Vp/Vs
+        tk.Label(self.frame_layer1_oil, text="Vp/Vs :").grid(row=4, column=0)
+        self.vp_vs1_oil = 0
+        self.label_vp_vs1_oil = IntVar()
+        self.label_vp_vs1_oil.set(self.vp_vs1_water)
+        self.total_vp_vs1_oil = tk.Label(self.frame_layer1_oil, textvariable=self.label_vp_vs1_oil)
+        self.total_vp_vs1_oil.grid(row=4, column=1)
+        # show Zp1
+        tk.Label(self.frame_layer1_oil, text="Zp1 :").grid(row=5, column=0)
+        self.zp1_oil = 0
+        self.label_zp1_oil = IntVar()
+        self.label_zp1_oil.set(self.zp1_water)
+        self.total_zp1_oil = tk.Label(self.frame_layer1_oil, textvariable=self.label_zp1_oil)
+        self.total_zp1_oil.grid(row=5, column=1)
+        # show Rp
+        tk.Label(self.frame_layer1_oil, text="Rp :").grid(row=6, column=0)
+        self.rp_oil = 0
+        self.label_rp_oil = IntVar()
+        self.label_rp_oil.set(self.rp)
+        self.total_rp_oil = tk.Label(self.frame_layer1_oil, textvariable=self.label_rp_oil)
+        self.total_rp_oil.grid(row=6, column=1)
+        #### Layer 2
+        # P-Wave 2
+        tk.Label(self.frame_layer2_oil, text='P-Wave Velocity2 :').grid(row=0, column=0)
+        self.entry_P2_oil = tk.Entry(self.frame_layer2_oil, bd=3, width=5)
+        self.entry_P2_oil.grid(row=0, column=1)
+        # Density 2
+        tk.Label(self.frame_layer2_oil, text='Density2 :').grid(row=1, column=0)
+        self.entry_D2_oil = tk.Entry(self.frame_layer2_oil, bd=3, width=5)
+        self.entry_D2_oil.grid(row=1, column=1)
+        # S-Wave2
+        tk.Label(self.frame_layer2_oil, text='S-Wave2 :').grid(row=2, column=0)
+        self.entry_S2_oil = tk.Entry(self.frame_layer2_oil, bd=3, width=5)
+        self.entry_S2_oil.grid(row=2, column=1)
+        # show poisson 2
+        tk.Label(self.frame_layer2_oil, text="Poisson's ratio 2 :").grid(row=3, column=0)
+        self.poisson2_oil =0
+        self.label_poisson2_oil = IntVar()
+        self.label_poisson2_oil.set(self.poisson2_oil)
+        self.total_poisson2_oil = tk.Label(self.frame_layer2_oil, textvariable=self.label_poisson2_oil)
+        self.total_poisson2_oil.grid(row=3, column=1)
+        # show Vp/Vs 2
+        tk.Label(self.frame_layer2_oil, text="Vp/Vs :").grid(row=4, column=0)
+        self.vp_vs2_oil = 0
+        self.label_vp_vs2_oil = IntVar()
+        self.label_vp_vs2_oil.set(self.vp_vs2_oil)
+        self.total_vp_vs2_oil = tk.Label(self.frame_layer2_oil, textvariable=self.label_vp_vs2_oil)
+        self.total_vp_vs2_oil.grid(row=4, column=1)
+        # show Zp2
+        tk.Label(self.frame_layer2_oil, text="Zp2 :").grid(row=5, column=0)
+        self.zp2_oil = 0
+        self.label_zp2_oil = IntVar()
+        self.label_zp2_oil.set(self.zp2_oil)
+        self.total_zp2_oil = tk.Label(self.frame_layer2_oil, textvariable=self.label_zp2_oil)
+        self.total_zp2_oil.grid(row=5, column=1)
+
+
+       
+
+
+        
+
 
         ##############     tab2      ########################
         self.create_tab2()
@@ -223,12 +416,12 @@ class Graph(tk.Tk):
         self.canvas3.get_tk_widget().grid(row=0, column=0)
         self.canvas3.draw()
 
-        self.fig4 = Figure(figsize=(3,3)) # fig vp : poison
+        self.fig4 = Figure(figsize=(3,3)) # fig vp : poisson
         self.canvas4 = FigureCanvasTkAgg(self.fig4, master=self.fig4_frame)
         self.canvas4.get_tk_widget().grid(row=0, column=0)
         self.canvas4.draw()
 
-        self.fig5 = Figure(figsize=(3,3))
+        self.fig5 = Figure(figsize=(3,3)) # fig vs : poisson
         self.canvas5 = FigureCanvasTkAgg(self.fig5, master=self.fig5_frame)
         self.canvas5.get_tk_widget().grid(row=0, column=0)
         self.canvas5.draw()
@@ -336,11 +529,6 @@ class Graph(tk.Tk):
             start_y = int(self.start_axis_y.get())
             stop_y = int(self.stop_axis_y.get())
 
-            # Sent data to tab2
-            # self.Vp1 = P1
-            # self.Vs1 = S1
-            # self.D1 = D1
-
             # calculate poisson
             self.poisson1 = self.cal_poisson(S1, P1)
             self.label_poisson1.set(round(self.poisson1, 3))
@@ -395,19 +583,20 @@ class Graph(tk.Tk):
             #### plot Graph tab 1 ####
             self.Change_axis(start_y, stop_y, data_x_aki,data_y_aki)
 
-            #### plot Graph tab 2 ####
+            ################################################################ plot Graph tab 2 ################################################################
             #self.plot_graph_VP_VS_tab2(self.vp_vs1, D1, self.vp_vs2, D2) 
 
             self.plot_graph_vs_density(S1, D1, S2, D2)
             self.plot_graph_vp_density(P1, D1, P2, D2)
             self.plot_graph_vp_poisson(P1, self.poisson1, P2, self.poisson2)
             self.plot_graph_vs_poisson(S1, self.poisson1, S2, self.poisson2)
-            
+            ##################################################################################################################################################
         except ValueError:
             print('Please enter number into field')
             msg.showwarning("Graph Warning","Please enter number into field !!!")
 
-    ###########  Formula  ###########
+
+    ########################################################################  Formula  ########################################################################
     
     def cal_poisson(self, s_wave, p_wave):
         # (0.5-(s_wave / p_wave)^2)/(1-(s_wave/p_wave)^2)
@@ -468,8 +657,10 @@ class Graph(tk.Tk):
         except ZeroDivisionError:
             print('Zero division')
             msg.showwarning("Graph Warning","Please Check number in field (float division by zero)")
-
-    #####    Plot   #####
+    #########################################################################################################################################################################
+    
+    
+    ###############################################################################    Plot   ###############################################################################
 
     def plot_graph_change_axis(self,x,y,aki_x,aki_y,tick_y):
         self.a = self.fig.add_subplot(1,1,1)
