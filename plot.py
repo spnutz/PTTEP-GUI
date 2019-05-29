@@ -64,7 +64,7 @@ class Graph(tk.Tk):
         # Add logo PTTEP
         self.img = ImageTk.PhotoImage(Image.open("Picture/icon.png"))
         self.panel = ttk.Label(self.frame_input, image= self.img)
-        self.panel.grid(row=0, column=0) 
+        self.panel.grid(row=0, column=0, padx=20) 
 
 
         # Add widget #
@@ -199,28 +199,127 @@ class Graph(tk.Tk):
         self.big_frame2.grid(row=0, column=0)
         tk.Label(self.big_frame2, text="")
 
-         # fig tab2
-        self.fig2 = Figure(figsize=(8,3))
-        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.big_frame2)
-        self.canvas2.get_tk_widget().grid(row=1, column=0)
+        self.fig2_frame = ttk.LabelFrame(self.big_frame2)
+        self.fig2_frame.grid(row=0, column=0)
+
+        self.fig3_frame = ttk.LabelFrame(self.big_frame2)
+        self.fig3_frame.grid(row=0, column=1)
+
+        self.fig4_frame = ttk.LabelFrame(self.big_frame2)
+        self.fig4_frame.grid(row=1, column=0)
+
+        self.fig5_frame = ttk.LabelFrame(self.big_frame2)
+        self.fig5_frame.grid(row=1, column=1)
+        
+
+        ### fig tab2 ###
+        self.fig2 = Figure(figsize=(3,3)) # fig vp : D
+        self.canvas2 = FigureCanvasTkAgg(self.fig2, master=self.fig2_frame)
+        self.canvas2.get_tk_widget().grid(row=0, column=0)
         self.canvas2.draw() 
 
-  
-    def plot_graph_tab2(self,Vs1,Vp1,D1):
-        ax1 = self.fig2.add_subplot(1,3,1)
-        ax1.clear()
-        ax1.set_xlabel('Density')
-        ax1.set_ylabel('Vs')
-       
-        ax2 = ax1.twinx()
-        ax2.clear()
-        ax2.set_ylabel('Vp')
+        self.fig3 = Figure(figsize=(3,3)) # fig vs : D
+        self.canvas3 = FigureCanvasTkAgg(self.fig3, master=self.fig3_frame)
+        self.canvas3.get_tk_widget().grid(row=0, column=0)
+        self.canvas3.draw()
 
-        ax1.plot(D1,Vs1, marker='o')
-        ax2.plot(D1,Vp1, marker='o')
+        self.fig4 = Figure(figsize=(3,3)) # fig vp : poison
+        self.canvas4 = FigureCanvasTkAgg(self.fig4, master=self.fig4_frame)
+        self.canvas4.get_tk_widget().grid(row=0, column=0)
+        self.canvas4.draw()
 
+        self.fig5 = Figure(figsize=(3,3))
+        self.canvas5 = FigureCanvasTkAgg(self.fig5, master=self.fig5_frame)
+        self.canvas5.get_tk_widget().grid(row=0, column=0)
+        self.canvas5.draw()
+
+    def plot_graph_vp_density(self, P1, D1, P2, D2):
+        '''plot Vp : Density'''
+        ax = self.fig2.add_subplot(1,1,1)
+        ax.clear()
+        # set Label
+        ax.set_xlabel('Density',fontsize=8)
+        ax.set_ylabel('Vp',fontsize=8)
+        # plot
+        ax.plot(D1, P1, marker='v', label="Layer 1")
+        ax.plot(D2, P2, marker = '^' , label="Layer 2")
+        ax.tick_params(axis="y", labelsize=8)
+        ax.tick_params(axis="x", labelsize=8)
+        ax.legend()
+        ax.grid()
+        # draw figure into gui
         self.fig2.tight_layout()
         self.canvas2.draw()
+
+    def plot_graph_vs_density(self, S1, D1, S2, D2):
+        ''' plot Vs:Density'''
+        ax = self.fig3.add_subplot(1,1,1)
+        ax.clear()
+        # set Label
+        ax.set_xlabel('Density',fontsize=8)
+        ax.set_ylabel('Vs',fontsize=8)
+        # plot
+        ax.plot(D1, S1, marker='*', label="Layer 1")
+        ax.plot(D2, S2, marker = '^' , label="Layer 2")
+        ax.tick_params(axis="y", labelsize=8)
+        ax.tick_params(axis="x", labelsize=8)
+        ax.legend()
+        ax.grid()
+        # draw figure into gui
+        self.fig3.tight_layout()
+        self.canvas3.draw()
+
+    def plot_graph_vp_poisson(self, P1, poisson1, P2, poisson2):
+        '''plot vp : poisson'''
+        ax = self.fig4.add_subplot(1,1,1)
+        ax.clear()
+        # set Label
+        ax.set_xlabel('Poisson',fontsize=8)
+        ax.set_ylabel('Vp',fontsize=8)
+        ax.tick_params(axis="y", labelsize=8)
+        ax.tick_params(axis="x", labelsize=8)
+        # plot
+        ax.plot(poisson1, P1, marker='*', label="Layer 1")
+        ax.plot(poisson2, P2, marker = '^' , label="Layer 2")
+        ax.legend()
+        ax.grid()
+        # draw figure into gui
+        self.fig4.tight_layout()
+        self.canvas4.draw()
+
+    def plot_graph_vs_poisson(self, S1, poisson1, S2, poisson2):
+        '''plot vs : poisson'''
+        ax = self.fig5.add_subplot(1,1,1)
+        ax.clear()
+        # set Label
+        ax.set_xlabel('Poisson',fontsize=8)
+        ax.set_ylabel('Vs',fontsize=8)
+        ax.tick_params(axis="y", labelsize=8)
+        ax.tick_params(axis="x", labelsize=8)
+        # plot
+        ax.plot(poisson1, S1, marker='*', label="Layer 1")
+        ax.plot(poisson2, S2, marker = '^' , label="Layer 2")
+        ax.legend()
+        ax.grid()
+        # draw figure into gui
+        self.fig5.tight_layout()
+        self.canvas5.draw()
+  
+    # def plot_graph_VP_VS_tab2(self, vp_vs1, D1, vp_vs2, D2):
+    #     '''Vp/Vs and Density'''
+    #     ax = self.fig2.add_subplot(1,1,1)
+    #     ax.clear()
+    #     # set Label
+    #     ax.set_xlabel('Density',fontsize=8)
+    #     ax.set_ylabel('Vp/Vs',fontsize=8)
+    #     # plot
+    #     ax.plot(D1, vp_vs1, marker='o', label="Layer 1")
+    #     ax.plot(D2, vp_vs2, marker = '^' , label="Layer 2")
+    #     ax.legend()
+    #     ax.grid()
+    #     # draw figure into gui
+    #     self.fig2.tight_layout()
+    #     self.canvas2.draw()
         
     #### get data from input #####
 
@@ -238,9 +337,9 @@ class Graph(tk.Tk):
             stop_y = int(self.stop_axis_y.get())
 
             # Sent data to tab2
-            self.Vp1 = P1
-            self.Vs1 = S1
-            self.D1 = D1
+            # self.Vp1 = P1
+            # self.Vs1 = S1
+            # self.D1 = D1
 
             # calculate poisson
             self.poisson1 = self.cal_poisson(S1, P1)
@@ -293,11 +392,17 @@ class Graph(tk.Tk):
             self.rp = self.data_y[0]
             self.label_rp.set(round(self.rp, 3))
         
-            # plot AVO
+            #### plot Graph tab 1 ####
             self.Change_axis(start_y, stop_y, data_x_aki,data_y_aki)
-            self.plot_graph_tab2(self.Vs1, self.Vp1, self.D1) 
-            #plot Aki
-            #self.plot_aki(data_x_aki, data_y_aki)
+
+            #### plot Graph tab 2 ####
+            #self.plot_graph_VP_VS_tab2(self.vp_vs1, D1, self.vp_vs2, D2) 
+
+            self.plot_graph_vs_density(S1, D1, S2, D2)
+            self.plot_graph_vp_density(P1, D1, P2, D2)
+            self.plot_graph_vp_poisson(P1, self.poisson1, P2, self.poisson2)
+            self.plot_graph_vs_poisson(S1, self.poisson1, S2, self.poisson2)
+            
         except ValueError:
             print('Please enter number into field')
             msg.showwarning("Graph Warning","Please enter number into field !!!")
