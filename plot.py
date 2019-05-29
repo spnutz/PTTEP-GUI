@@ -518,37 +518,53 @@ class Graph(tk.Tk):
 
     def getData(self):
         try:
+            # input of gas
             P1 = float(self.entry_P1.get())
             D1 = float(self.entry_D1.get())
             S1 = float(self.entry_S1.get())
-
             P2 = float(self.entry_P2.get())
             D2 = float(self.entry_D2.get())
             S2 = float(self.entry_S2.get())
-
+            #input of water
+            P1_water = float(self.entry_P1_water.get())
+            D1_water = float(self.entry_D1_water.get())
+            S1_water = float(self.entry_S1_water.get())
+            P2_water = float(self.entry_P2_water.get())
+            D2_water = float(self.entry_D2_water.get())
+            S2_water = float(self.entry_S2_water.get())
+            #input of oil
+            P1_oil = float(self.entry_P1_oil.get())
+            D1_oil = float(self.entry_D1_oil.get())
+            S1_oil = float(self.entry_S1_oil.get())
+            P2_oil = float(self.entry_P2_oil.get())
+            D2_oil = float(self.entry_D2_oil.get())
+            S2_oil = float(self.entry_S2_oil.get())
+            # input of change axis
             start_y = int(self.start_axis_y.get())
             stop_y = int(self.stop_axis_y.get())
 
             # calculate poisson
             self.poisson1 = self.cal_poisson(S1, P1)
             self.label_poisson1.set(round(self.poisson1, 3))
-
             self.poisson2 = self.cal_poisson(S2, P2)
             self.label_poisson2.set(round(self.poisson2, 3))
-
             # calculate Vp/Vs1
             self.vp_vs1 = P1/S1
             self.label_vp_vs1.set(round(self.vp_vs1, 3))
-
             self.vp_vs2 = P2/S2
             self.label_vp_vs2.set(round(self.vp_vs2, 3))
-
             # calculate Zp1
             self.zp1 = D1*P1
             self.label_zp1.set(round(self.zp1, 3))
-
             self.zp2 = D2*P2
             self.label_zp2.set(round(self.zp2, 3))
+
+            ############# part of water #############
+            # calculate poisson
+            self.poisson1_water = self.cal_poisson(S1_water, P1_water)
+            self.label_poisson1_water.set(round(self.poisson1_water, 3))
+            self.poisson2_water = self.cal_poisson(S2_water, P2_water)
+            self.label_poisson2_water.set(round(self.poisson2_water, 3))
 
             # Calculate A, B, C from Aki-Richards
             A = self.cal_A(P1, P2, D1, D2)
@@ -558,6 +574,10 @@ class Graph(tk.Tk):
             #calculate reflection
             self.data_x = [] # data in AVO
             self.data_y = [] # data in Avo
+            self.data_x_water = []
+            self.data_y_water = []
+            self.data_x_oil = []
+            self.data_y_oil = []
             data_x_aki = [] # data in Aki
             data_y_aki = [] # data in Aki
             for n in range(91):
@@ -565,8 +585,16 @@ class Graph(tk.Tk):
                 x = (n*t)/180 # radians
                 # AVO
                 reflect = self.reflection(P1, D1, P2, D2, self.poisson1, self.poisson2, x)
+                reflect_water = self.reflection(P1_water, D1_water, P2_water, D2_water, self.poisson1_water, self.poisson2_water, x)
+                reflect_oil = self.reflection(P1_oil, D1_oil, P2_oil, D2_oil, self.poisson1_oil, self.poisson2_oil, x)
                 self.data_y.append(float(reflect))
                 self.data_x.append(float(n))
+
+                self.data_x_water.append(float(reflect_water))
+            
+                
+                self.data_x_oil.append(float(reflect_oil))
+            print(self.data_x_water)
                 
             # Aki
             for i in range(80):
@@ -768,7 +796,7 @@ class Graph(tk.Tk):
         
 ####################
 #     STRAT GUI    #
-####################
+####################0
 if __name__ == "__main__":
     app = Graph()
     app.mainloop()
