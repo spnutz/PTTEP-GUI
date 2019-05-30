@@ -565,6 +565,34 @@ class Graph(tk.Tk):
             self.label_poisson1_water.set(round(self.poisson1_water, 3))
             self.poisson2_water = self.cal_poisson(S2_water, P2_water)
             self.label_poisson2_water.set(round(self.poisson2_water, 3))
+            # calculate Vp/Vs1
+            self.vp_vs1_water = P1_water/S1_water
+            self.label_vp_vs1_water.set(round(self.vp_vs1_water, 3))
+            self.vp_vs2_water = P2_water/S2_water
+            self.label_vp_vs2_water.set(round(self.vp_vs2_water, 3))
+            # calculate Zp1
+            self.zp1_water = D1_water*P1_water
+            self.label_zp1_water.set(round(self.zp1_water, 3))
+            self.zp2_water = D2_water*P2_water
+            self.label_zp2_water.set(round(self.zp2_water, 3))
+
+            ############### part of oil ###############
+            # calculate poisson
+            self.poisson1_oil = self.cal_poisson(S1_oil, P1_oil)
+            self.label_poisson1_oil.set(round(self.poisson1_oil, 3))
+            self.poisson2_oil = self.cal_poisson(S2_oil, P2_oil)
+            self.label_poisson2_oil.set(round(self.poisson2_oil, 3))
+            # calculate Vp/Vs1
+            self.vp_vs1_oil = P1_oil/S1_oil
+            self.label_vp_vs1_oil.set(round(self.vp_vs1_oil, 3))
+            self.vp_vs2_oil = P2_oil/S2_oil
+            self.label_vp_vs2_oil.set(round(self.vp_vs2_oil, 3))
+            # calculate Zp1
+            self.zp1_oil = D1_oil*P1_oil
+            self.label_zp1_oil.set(round(self.zp1_oil, 3))
+            self.zp2_oil = D2_oil*P2_oil
+            self.label_zp2_oil.set(round(self.zp2_oil, 3))
+ 
 
             # Calculate A, B, C from Aki-Richards
             A = self.cal_A(P1, P2, D1, D2)
@@ -578,8 +606,8 @@ class Graph(tk.Tk):
             self.data_y_water = []
             self.data_x_oil = []
             self.data_y_oil = []
-            data_x_aki = [] # data in Aki
-            data_y_aki = [] # data in Aki
+            # data_x_aki = [] # data in Aki
+            # data_y_aki = [] # data in Aki
             for n in range(91):
                 t = math.pi
                 x = (n*t)/180 # radians
@@ -587,29 +615,32 @@ class Graph(tk.Tk):
                 reflect = self.reflection(P1, D1, P2, D2, self.poisson1, self.poisson2, x)
                 reflect_water = self.reflection(P1_water, D1_water, P2_water, D2_water, self.poisson1_water, self.poisson2_water, x)
                 reflect_oil = self.reflection(P1_oil, D1_oil, P2_oil, D2_oil, self.poisson1_oil, self.poisson2_oil, x)
-                self.data_y.append(float(reflect))
+                self.data_y.append(float(reflect)) # gas
                 self.data_x.append(float(n))
-
-                self.data_x_water.append(float(reflect_water))
-            
-                
-                self.data_x_oil.append(float(reflect_oil))
-            print(self.data_x_water)
-                
+                self.data_y_water.append(float(reflect_water)) # water        
+                self.data_y_oil.append(float(reflect_oil)) # oil
+               
             # Aki
-            for i in range(80):
-                t = math.pi
-                x = (i*t)/180
-                aki = self.reflaction_aki(A, B, C, x)
-                data_y_aki.append(float(aki))
-                data_x_aki.append(float(i))
+            # for i in range(80):
+            #     t = math.pi
+            #     x = (i*t)/180
+            #     aki = self.reflaction_aki(A, B, C, x)
+            #     data_y_aki.append(float(aki))
+            #     data_x_aki.append(float(i))
 
-            # calculate and show rp
+            ######### calculate and show rp #########
+            # part of gas
             self.rp = self.data_y[0]
             self.label_rp.set(round(self.rp, 3))
+            # part of water
+            self.rp_water = self.data_y_water[0]
+            self.label_rp_water.set(round(self.rp_water, 3))
+            # part of oil
+            self.rp_oil = self.data_y_oil[0]
+            self.label_rp_oil.set(round(self.rp_oil, 3))
         
-            #### plot Graph tab 1 ####
-            self.Change_axis(start_y, stop_y, data_x_aki,data_y_aki)
+            ############ plot Graph tab 1 ############
+            self.Change_axis(start_y, stop_y)
 
             ################################################################ plot Graph tab 2 ################################################################
             #self.plot_graph_VP_VS_tab2(self.vp_vs1, D1, self.vp_vs2, D2) 
@@ -690,13 +721,14 @@ class Graph(tk.Tk):
     
     ###############################################################################    Plot   ###############################################################################
 
-    def plot_graph_change_axis(self,x,y,aki_x,aki_y,tick_y):
+    def plot_graph_change_axis(self,x, y_gas, y_water, y_oil, total_y):
         self.a = self.fig.add_subplot(1,1,1)
         self.a.clear()
 
-        self.a.plot(x,y, label='AVO')
-
-        self.a.plot(aki_x, aki_y, label='Aki-Richards')
+        self.a.plot(x, y_gas, label='Gas')
+        self.a.plot(x, y_water, label = 'Water')
+        self.a.plot(x, y_oil, label= 'Oil')
+        #self.a.plot(aki_x, aki_y, label='Aki-Richards')
         self.a.legend()
         self.a.grid(True)
         self.a.set_title('Shuey(AVO) and Aki-Richards Approximation')
@@ -704,19 +736,21 @@ class Graph(tk.Tk):
         self.a.set_ylabel('Amplitude', fontsize=8)
         self.a.tick_params(axis="y", labelsize=8, rotation=90)
         self.a.tick_params(axis="x", labelsize=8)
-        self.a.set_yticks(tick_y)
+        self.a.set_yticks(total_y)
 
         self.fig.tight_layout()
         self.canvas.draw()
 
-    def plot_graph(self,x,y,aki_x,aki_y):
+    def plot_graph(self, x, y_gas, y_water, y_oil):
         # AVO
         self.a = self.fig.add_subplot(1,1,1)
         self.a.clear()
         #a.plot(x,y,label=r'$R(\theta) = \frac{\rho_2 V_2 - \rho_1 V_1}{\rho_2 V_2 + \rho_1 V_1}\cos^2(\theta) + \frac{\sigma_2 - \sigma_1}{(1 - \sigma_{avr})^2}\sin^2(\theta)$')
-        self.a.plot(x,y, label='AVO')
+        self.a.plot(x, y_gas, label='Gas')
+        self.a.plot(x, y_water, label = 'Water')
+        self.a.plot(x, y_oil, label = 'Oil')
 
-        self.a.plot(aki_x, aki_y, label='Aki-Richards')
+        #self.a.plot(aki_x, aki_y, label='Aki-Richards')
         self.a.legend()
         self.a.grid(True)
         self.a.set_title('Shuey(AVO) and Aki-Richards Approximation')
@@ -741,16 +775,16 @@ class Graph(tk.Tk):
         b.set_xticks([0, 10, 20, 30, 40, 50, 60, 70, 80 ,90])
         self.canvas2.draw()
 
-    def Change_axis(self,start_y, stop_y, data_x_aki, data_y_aki):
+    def Change_axis(self,start_y, stop_y):
         step = float(self.step.get())
         total_y = []
         if start_y == int(0) and stop_y == int(0):
-            self.plot_graph(self.data_x, self.data_y, data_x_aki, data_y_aki)
+            self.plot_graph(self.data_x, self.data_y, self.data_y_water, self.data_y_oil)
         else:
             
             for i in self.frange(start_y, stop_y+1,step):
                 total_y.append(float(i))
-            self.plot_graph_change_axis(self.data_x, self.data_y, data_x_aki, data_y_aki,total_y)
+            self.plot_graph_change_axis(self.data_x, self.data_y, self.data_y_water, self.data_y_oil, total_y)
         
 
     def frange(self,start, stop=None, step=None):
