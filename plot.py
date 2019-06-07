@@ -15,7 +15,7 @@ class Graph(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self.resizable(False, False) # disable resize window
-        self.title("Graph GUI")
+        self.title("DHS Software")
 
         # Add icon
         self.iconbitmap('Picture/logo.ico')
@@ -61,24 +61,24 @@ class Graph(tk.Tk):
 
         # gas case
         self.frame1 = ttk.LabelFrame(self.frame_gas, text="Layer 1")
-        self.frame1.grid(row=1, column=0, padx=20)
+        self.frame1.grid(row=1, column=0, padx=5)
         
         self.frame_layer2 = ttk.LabelFrame(self.frame_gas, text="Layer 2")
-        self.frame_layer2.grid(row=2, column=0, padx=20)
+        self.frame_layer2.grid(row=2, column=0, padx=5)
 
         # water case
         self.frame_layer1_water = ttk.LabelFrame(self.frame_water, text="Layer 1")
-        self.frame_layer1_water.grid(row=0, column=0)
+        self.frame_layer1_water.grid(row=0, column=0, padx=5)
 
         self.frame_layer2_water = ttk.LabelFrame(self.frame_water, text="Layer 2")
-        self.frame_layer2_water.grid(row=1, column=0)
+        self.frame_layer2_water.grid(row=1, column=0, padx=5)
 
         # oil case
         self.frame_layer1_oil = ttk.LabelFrame(self.frame_oil, text="Layer 1")
-        self.frame_layer1_oil.grid(row=0, column=0)
+        self.frame_layer1_oil.grid(row=0, column=0, padx=5)
 
         self.frame_layer2_oil = ttk.LabelFrame(self.frame_oil, text="Layer 2")
-        self.frame_layer2_oil.grid(row=1, column=0)
+        self.frame_layer2_oil.grid(row=1, column=0, padx=5)
 
 
 
@@ -93,9 +93,13 @@ class Graph(tk.Tk):
         self.frame_axis.grid(row=3, column=0)
 
         # Add logo PTTEP
-        self.img = ImageTk.PhotoImage(Image.open("Picture/icon.png"))
-        self.panel = ttk.Label(self.logo_frame, image= self.img)
-        self.panel.grid(row=0, column=0, padx=20) 
+        #self.img = ImageTk.PhotoImage(Image.open("Picture/icon.png"))
+        self.img = Image.open("Picture/icon.png")
+        self.img = self.img.resize((150,150), Image.ANTIALIAS)
+        self.photoimg = ImageTk.PhotoImage(self.img)
+        self.panel = ttk.Label(self.logo_frame, image= self.photoimg )
+        self.panel.grid(row=0, column=0, padx=20, pady=35) 
+        
 
 
         # Add widget #
@@ -206,8 +210,8 @@ class Graph(tk.Tk):
         self.total_rp.grid(row=6, column=1)
 
         # Button plot
-        self.btn_plot = tk.Button(self.frame_layer2, text="Plot", command=self.getData, width=5)
-        self.btn_plot.grid(row=6, column=1)
+        self.btn_plot = tk.Button(self.frame_axis, text="Plot", command=self.getData, width=5)
+        self.btn_plot.grid(row=1, column=3)
 
         # fig AVO
         self.fig = Figure(figsize=(5,5.15))
@@ -426,7 +430,7 @@ class Graph(tk.Tk):
         self.canvas5.get_tk_widget().grid(row=0, column=0)
         self.canvas5.draw()
 
-    def plot_graph_vp_density(self, P1, D1, P2, D2):
+    def plot_graph_vp_density(self, P1, D1, P2, D2, P1_water, D1_water, P2_water, D2_water, P1_oil, D1_oil, P2_oil, D2_oil):
         '''plot Vp : Density'''
         ax = self.fig2.add_subplot(1,1,1)
         ax.clear()
@@ -434,8 +438,15 @@ class Graph(tk.Tk):
         ax.set_xlabel('Density',fontsize=8)
         ax.set_ylabel('Vp',fontsize=8)
         # plot
-        ax.plot(D1, P1, marker='v', label="Layer 1")
-        ax.plot(D2, P2, marker = '^' , label="Layer 2")
+        # Gas #
+        ax.plot(D1, P1, marker='v', label="Layer 1 Gas")
+        ax.plot(D2, P2, marker = '^' , label="Layer 2 Gas")
+        # Water #
+        ax.plot(D1_water, P1_water, marker='v', label="Layer 1 Water")
+        ax.plot(D2_water, P2_water, marker = '^' , label="Layer 2 Water")
+        # Oil #
+        ax.plot(D1_oil, P1_oil, marker='v', label="Layer 1 oil")
+        ax.plot(D2_oil, P2_oil, marker = '^' , label="Layer 2 oil")
         ax.tick_params(axis="y", labelsize=8)
         ax.tick_params(axis="x", labelsize=8)
         ax.legend()
@@ -444,7 +455,7 @@ class Graph(tk.Tk):
         self.fig2.tight_layout()
         self.canvas2.draw()
 
-    def plot_graph_vs_density(self, S1, D1, S2, D2):
+    def plot_graph_vs_density(self, S1, D1, S2, D2, S1_water, D1_water, S2_water, D2_water, S1_oil, D1_oil, S2_oil, D2_oil):
         ''' plot Vs:Density'''
         ax = self.fig3.add_subplot(1,1,1)
         ax.clear()
@@ -452,8 +463,15 @@ class Graph(tk.Tk):
         ax.set_xlabel('Density',fontsize=8)
         ax.set_ylabel('Vs',fontsize=8)
         # plot
-        ax.plot(D1, S1, marker='*', label="Layer 1")
-        ax.plot(D2, S2, marker = '^' , label="Layer 2")
+        # Gas #
+        ax.plot(D1, S1, marker='*', label="Layer 1 Gas")
+        ax.plot(D2, S2, marker = '^' , label="Layer 2 Gas")
+        # Water #
+        ax.plot(D1_water, S1_water, marker='v', label="Layer 1 Water")
+        ax.plot(D2_water, S2_water, marker = '^' , label="Layer 2 Water")
+        # Oil #
+        ax.plot(D1_oil, S1_oil, marker='v', label="Layer 1 oil")
+        ax.plot(D2_oil, S2_oil, marker = '^' , label="Layer 2 oil")
         ax.tick_params(axis="y", labelsize=8)
         ax.tick_params(axis="x", labelsize=8)
         ax.legend()
@@ -462,7 +480,7 @@ class Graph(tk.Tk):
         self.fig3.tight_layout()
         self.canvas3.draw()
 
-    def plot_graph_vp_poisson(self, P1, poisson1, P2, poisson2):
+    def plot_graph_vp_poisson(self, P1, poisson1, P2, poisson2, P1_water, poisson1_water, P2_water, poisson2_water, P1_oil, poisson1_oil, P2_oil, poisson2_oil):
         '''plot vp : poisson'''
         ax = self.fig4.add_subplot(1,1,1)
         ax.clear()
@@ -472,15 +490,22 @@ class Graph(tk.Tk):
         ax.tick_params(axis="y", labelsize=8)
         ax.tick_params(axis="x", labelsize=8)
         # plot
-        ax.plot(poisson1, P1, marker='*', label="Layer 1")
-        ax.plot(poisson2, P2, marker = '^' , label="Layer 2")
+        # Gas #
+        ax.plot(poisson1, P1, marker='*', label="Layer 1 Gas")
+        ax.plot(poisson2, P2, marker = '^' , label="Layer 2 Gas")
+        # Water #
+        ax.plot(poisson1_water, P1_water, marker='*', label="Layer 1 Water")
+        ax.plot(poisson2_water, P2_water, marker = '^' , label="Layer 2 Water")
+        # Oil #
+        ax.plot(poisson1_oil, P1_oil, marker='*', label="Layer 1 Oil")
+        ax.plot(poisson2_oil, P2_oil, marker = '^' , label="Layer 2 Oil")
         ax.legend()
         ax.grid()
         # draw figure into gui
         self.fig4.tight_layout()
         self.canvas4.draw()
 
-    def plot_graph_vs_poisson(self, S1, poisson1, S2, poisson2):
+    def plot_graph_vs_poisson(self, S1, poisson1, S2, poisson2, S1_water, poisson1_water, S2_water, poisson2_water, S1_oil, poisson1_oil, S2_oil, poisson2_oil):
         '''plot vs : poisson'''
         ax = self.fig5.add_subplot(1,1,1)
         ax.clear()
@@ -490,8 +515,15 @@ class Graph(tk.Tk):
         ax.tick_params(axis="y", labelsize=8)
         ax.tick_params(axis="x", labelsize=8)
         # plot
-        ax.plot(poisson1, S1, marker='*', label="Layer 1")
-        ax.plot(poisson2, S2, marker = '^' , label="Layer 2")
+        # Gas #
+        ax.plot(poisson1, S1, marker='*', label="Layer 1 Gas")
+        ax.plot(poisson2, S2, marker = '^' , label="Layer 2 Gas")
+        # Water #
+        ax.plot(poisson1_water, S1_water, marker='*', label="Layer 1 Water")
+        ax.plot(poisson2_water, S2_water, marker = '^' , label="Layer 2 Water")
+        # Oil #
+        ax.plot(poisson1_oil, S1_oil, marker='*', label="Layer 1 Oil")
+        ax.plot(poisson2_oil, S2_oil, marker = '^' , label="Layer 2 Oil")
         ax.legend()
         ax.grid()
         # draw figure into gui
@@ -619,6 +651,7 @@ class Graph(tk.Tk):
                 self.data_x.append(float(n))
                 self.data_y_water.append(float(reflect_water)) # water        
                 self.data_y_oil.append(float(reflect_oil)) # oil
+
                
             # Aki
             # for i in range(80):
@@ -645,10 +678,10 @@ class Graph(tk.Tk):
             ################################################################ plot Graph tab 2 ################################################################
             #self.plot_graph_VP_VS_tab2(self.vp_vs1, D1, self.vp_vs2, D2) 
 
-            self.plot_graph_vs_density(S1, D1, S2, D2)
-            self.plot_graph_vp_density(P1, D1, P2, D2)
-            self.plot_graph_vp_poisson(P1, self.poisson1, P2, self.poisson2)
-            self.plot_graph_vs_poisson(S1, self.poisson1, S2, self.poisson2)
+            self.plot_graph_vp_density(S1, D1, S2, D2, P1_water, D1_water, P2_water, D2_water, P1_oil, D1_oil, P2_oil, D2_oil)
+            self.plot_graph_vs_density(S1, D1, S2, D2, S1_water, D1_water, S2_water, D2_water, S1_oil, D1_oil, S2_oil, D2_oil)
+            self.plot_graph_vp_poisson(P1, self.poisson1, P2, self.poisson2, P1_water, self.poisson1_water, P2_water, self.poisson2_water, P1_oil, self.poisson1_oil, P2_oil, self.poisson2_oil)
+            self.plot_graph_vs_poisson(S1, self.poisson1, S2, self.poisson2, S1_water, self.poisson1_water, S2_water, self.poisson2_water, S1_oil, self.poisson1_oil, S2_oil, self.poisson2_oil)
             ##################################################################################################################################################
         except ValueError:
             print('Please enter number into field')
@@ -725,13 +758,13 @@ class Graph(tk.Tk):
         self.a = self.fig.add_subplot(1,1,1)
         self.a.clear()
 
-        self.a.plot(x, y_gas, label='Gas')
-        self.a.plot(x, y_water, label = 'Water')
-        self.a.plot(x, y_oil, label= 'Oil')
+        self.a.plot(x, y_gas, label='Gas', color="red")
+        self.a.plot(x, y_water, label = 'Water', color="blue")
+        self.a.plot(x, y_oil, label= 'Oil', color="green")
         #self.a.plot(aki_x, aki_y, label='Aki-Richards')
         self.a.legend()
         self.a.grid(True)
-        self.a.set_title('Shuey(AVO) and Aki-Richards Approximation')
+        self.a.set_title('Shuey(AVO) Approximation')
         self.a.set_xlabel('Incidence Angle(Degrees)', fontsize=8)
         self.a.set_ylabel('Amplitude', fontsize=8)
         self.a.tick_params(axis="y", labelsize=8, rotation=90)
@@ -746,14 +779,14 @@ class Graph(tk.Tk):
         self.a = self.fig.add_subplot(1,1,1)
         self.a.clear()
         #a.plot(x,y,label=r'$R(\theta) = \frac{\rho_2 V_2 - \rho_1 V_1}{\rho_2 V_2 + \rho_1 V_1}\cos^2(\theta) + \frac{\sigma_2 - \sigma_1}{(1 - \sigma_{avr})^2}\sin^2(\theta)$')
-        self.a.plot(x, y_gas, label='Gas')
-        self.a.plot(x, y_water, label = 'Water')
-        self.a.plot(x, y_oil, label = 'Oil')
+        self.a.plot(x, y_gas, label='Gas', color="red")
+        self.a.plot(x, y_water, label = 'Water', color="blue")
+        self.a.plot(x, y_oil, label = 'Oil', color="green")
 
         #self.a.plot(aki_x, aki_y, label='Aki-Richards')
         self.a.legend()
         self.a.grid(True)
-        self.a.set_title('Shuey(AVO) and Aki-Richards Approximation')
+        self.a.set_title('Shuey(AVO) Approximation')
         self.a.set_xlabel('Incidence Angle(Degrees)', fontsize=8)
         self.a.set_ylabel('Amplitude', fontsize=8)
         self.a.tick_params(axis="y", labelsize=8, rotation=90)
